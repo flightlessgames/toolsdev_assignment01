@@ -31,13 +31,6 @@ def scrape_list(sources):
 	for source in sources:
 		scrape(source)
 
-def open_articles(num):
-	#open first article as a new browser window
-	webbrowser.open(collected_articles[0].url, new=1)
-	for num in range(1, num):
-		#open subsequent articles as new tabs on the window
-		webbrowser.open(collected_articles[num].url, new=2)
-
 ###	###	###	### RUNTIME ### ### ### ###
 
 #start here, select a news source
@@ -102,4 +95,8 @@ writer.close()
 open_articles = input('Do you want to open all ' + str(counter) + ' articles on the web?\n[Y] OPEN; [N] DO NOT OPEN; ')
 
 if open_articles.lower() in ('y', 'yes', 'confirm'):
-	open_articles(counter-1)
+	#open first article as a new browser window
+	webbrowser.open(collected_articles[0].url, new=1)
+	for num in range(1, counter-1):
+		#open subsequent articles as new tabs on the window
+		webbrowser.open(collected_articles[num].url, new=2)
