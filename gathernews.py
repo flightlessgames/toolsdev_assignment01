@@ -34,7 +34,7 @@ def scrape_list(sources):
 ###	###	###	### RUNTIME ### ### ### ###
 
 #start here, select a news source
-selector = input('Choose a News Source: "CNN", "New York Times", or "Wall Street Journal", or select "All" ')
+selector = input('Choose a News Source: [CNN]; [New York Times]; [Wall Street Journal]; [All] ')
 
 if selector.lower() in ('cnn', 'cable news network'):
 	#parse our url1
@@ -49,35 +49,36 @@ elif selector.lower() in ('wsj', 'wall street journal'):
 	print('You have selected: WALL STREET JOURNAL. ')
 	scrape(url3)
 else:
-	#display error, parse out all 3
+	#display "error", parse out all 3
 	print('Now scraping All available news sources...')
 	scrape_list(news_sources)
 
-#after master list of articles is compiled, as for a keyword sort
-#TODO? make this before the master compile to save on resources at runtime?
-keyword = input('Would you like to narrow your search by entering a Keyword?\nHIT ENTER TO NOT USE A KEYWORD] ')
+#after master list of articles is compiled, ask for a keyword sort
+#TODO? make the keyword filter before the master compile to save on resources at runtime??
+keyword = input('Would you like to narrow your search by entering a Keyword?\n[HIT ENTER TO NOT USE A KEYWORD] ')
 
-counter = 0
-
+#create a second list for keyworded articles
 for article in collected_articles:
 	if keyword in article.url:
 		keyworded_articles.append(article)
-		counter = counter + 1
 
-print("Found " + str(counter) + " articles")
+print("Found " + str(len(keyworded_articles)) + " articles")
 
-writer = open(save_txt_path, 'w', encoding="utf-8")
+#begin the proccess of writing all found articles onto a .txt file
+writer = open(save_txt_path, 'w', encoding="utf-8") #encoding fixes bug issues
 
+#fun little bonus extra feature #1
 writer.write('==== Entry Date: ' + str(datetime.datetime.now()) + ' ====\n')
 
-for article in keyworded_articles:
-	
-	try: #some links are defunct and lead to 404 errors, use try/catch to eliminate bad links
+
+for article in keyworded_articles:	
+	#some links are defunct and lead to 404 errors, use try/catch to eliminate bad links
+	try: 
 		article.download()
 		article.parse()
 	except:
 		continue
-
+	#.txt formatting: "title" - "authors" \n "summary" \n\n
 	writer.write('\n' + str(article.title))
 	writer.write(' - ')
 
@@ -92,11 +93,12 @@ for article in keyworded_articles:
 
 writer.close()
 
-open_articles = input('Do you want to open all ' + str(counter) + ' articles on the web?\n[Y] OPEN; [N] DO NOT OPEN; ')
+#bonus feature #2, open articles on webapp
+open_articles = input('Do you want to open all ' + str(len(keyworded_articles)) + ' articles on the web?\n[Y] OPEN; [N] DO NOT OPEN; ')
 
 if open_articles.lower() in ('y', 'yes', 'confirm'):
-	#open first article as a new browser window
-	webbrowser.open(collected_articles[0].url, new=1)
-	for num in range(1, counter-1):
+	#open first article as a new browser window, pop into focus
+	webbrowser.open(collected_articles[0].url, new=1, autoraise=True)
+	for num in range(1, len(keyworded_articles)-1):
 		#open subsequent articles as new tabs on the window
 		webbrowser.open(collected_articles[num].url, new=2)
